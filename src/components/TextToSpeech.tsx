@@ -1,15 +1,31 @@
-import { memo } from "react";
+import { memo, useCallback, useEffect, useState } from "react";
 import { useSpeech } from "../hooks/useSpeech";
 
-const TEXT = "Hello World! My name is John.";
-
 export const TextToSpeech = memo(() => {
-  const { onPlay, onStop } = useSpeech({ text: TEXT });
+  const [text, setText] = useState("");
+  const { onPlay, onStop } = useSpeech({ text });
+
+  const fetchTitle = useCallback(() => {
+    fetch("https://jsonplaceholder.typicode.com/posts/1")
+      .then((response) => response.json())
+      .then(({ title }) => {
+        setText(title);
+      });
+  }, []);
+
+  useEffect(() => {
+    fetchTitle();
+  }, [fetchTitle]);
+
+  const handleLoadMore = useCallback(() => {
+    fetchTitle();
+  }, [fetchTitle]);
 
   return (
     <div>
       <button onClick={onPlay}>Play</button>
       <button onClick={onStop}>Pause</button>
+      <button onClick={handleLoadMore}>Load more</button>
     </div>
   );
 });
